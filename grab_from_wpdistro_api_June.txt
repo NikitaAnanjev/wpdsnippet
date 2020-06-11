@@ -217,3 +217,118 @@ Start
 2020-06-11 00:19:50 :: 9. Process snippet 74
 
 2020-06-11 00:19:50 :: Finished. Total execution time: 0 s
+
+2020-06-11 13:03:28 :: 
+Start
+2020-06-11 13:03:29 :: Array Vehicles found
+2020-06-11 13:03:29 :: 1. Process snippet 127
+
+2020-06-11 13:03:29 :: 2. Process snippet 125
+
+2020-06-11 13:03:29 :: 3. Process snippet 123
+
+2020-06-11 13:03:29 :: 4. Process snippet 120
+
+2020-06-11 13:03:29 :: 5. Process snippet 118
+
+2020-06-11 13:03:29 :: 6. Process snippet 116
+
+2020-06-11 13:03:29 :: 7. Process snippet 96
+
+2020-06-11 13:03:29 :: 8. Process snippet 84
+
+2020-06-11 13:03:29 :: 9. Process snippet 74
+
+2020-06-11 13:03:29 :: Finished. Total execution time: 1 s
+
+2020-06-11 13:19:06 :: 
+Start
+2020-06-11 13:19:06 :: Array Vehicles found
+2020-06-11 13:19:06 :: 1. Process snippet 127
+
+2020-06-11 13:19:06 :: 2. Process snippet 125
+
+2020-06-11 13:19:06 :: 3. Process snippet 123
+
+2020-06-11 13:19:06 :: 4. Process snippet 120
+
+2020-06-11 13:19:06 :: 5. Process snippet 118
+
+2020-06-11 13:19:06 :: 6. Process snippet 116
+
+2020-06-11 13:19:06 :: 7. Process snippet 96
+
+2020-06-11 13:19:06 :: 8. Process snippet 84
+
+2020-06-11 13:19:06 :: 9. Process snippet 74
+
+2020-06-11 13:19:06 :: Finished. Total execution time: 0 s
+
+2020-06-11 14:18:47 :: 
+Start
+2020-06-11 14:18:48 :: Array Vehicles found
+2020-06-11 14:18:48 :: 1. Process snippet 127
+
+2020-06-11 14:18:48 :: 2. Process snippet 125
+
+2020-06-11 14:18:48 :: 3. Process snippet 123
+
+2020-06-11 14:18:48 :: 4. Process snippet 120
+
+2020-06-11 14:18:48 :: 5. Process snippet 118
+
+2020-06-11 14:18:48 :: 6. Process snippet 116
+
+2020-06-11 14:18:48 :: 7. Process snippet 96
+
+2020-06-11 14:18:48 :: 8. Process snippet 84
+
+2020-06-11 14:18:48 :: 9. Process snippet 74
+
+2020-06-11 14:18:48 :: Finished. Total execution time: 1 s
+
+2020-06-11 15:19:23 :: 
+Start
+2020-06-11 15:19:23 :: Array Snippet found
+2020-06-11 15:19:23 :: 1. Process snippet 127
+
+2020-06-11 15:19:23 :: 2. Process snippet 125
+
+2020-06-11 15:19:23 :: 3. Process snippet 123
+
+2020-06-11 15:19:23 :: 4. Process snippet 120
+
+2020-06-11 15:19:23 :: 5. Process snippet 118
+
+2020-06-11 15:19:23 :: 6. Process snippet 116
+
+2020-06-11 15:19:23 :: 7. Process snippet 96
+
+2020-06-11 15:19:23 :: 8. Process snippet 84
+
+2020-06-11 15:19:23 :: 9. Process snippet 74
+
+2020-06-11 15:19:23 :: Finished. Total execution time: 0 s
+
+2020-06-11 16:19:29 :: 
+Start
+2020-06-11 16:19:31 :: Array Snippet found
+2020-06-11 16:19:31 :: 1. Process snippet 127
+
+2020-06-11 16:19:31 :: 2. Process snippet 125
+
+2020-06-11 16:19:31 :: 3. Process snippet 123
+
+2020-06-11 16:19:31 :: 4. Process snippet 120
+
+2020-06-11 16:19:31 :: 5. Process snippet 118
+
+2020-06-11 16:19:31 :: 6. Process snippet 116
+
+2020-06-11 16:19:31 :: 7. Process snippet 96
+
+2020-06-11 16:19:31 :: 8. Process snippet 84
+
+2020-06-11 16:19:31 :: 9. Process snippet 74
+
+2020-06-11 16:19:31 :: Finished. Total execution time: 2 s

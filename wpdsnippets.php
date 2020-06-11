@@ -37,8 +37,11 @@ class WpdSnippets
         add_action('init', array($this, 'init'));
     }
 
-    function register(){
-        add_action('admin_enqueue_scripts', array($this,'enqueue'));
+    function register()
+    {
+        add_action('admin_enqueue_scripts', array($this, 'enqueue'));
+
+        add_filter('manage_edit-wpd_snippets_columns', array($this, 'add_new_wpd_snippets_columns'));
     }
 
     function init()
@@ -59,7 +62,7 @@ class WpdSnippets
     }
 
 
- function activate()
+    function activate()
     {
 //    GENERATE CUSTOM POST TYPES
         $this->custom_post_type();
@@ -71,7 +74,7 @@ class WpdSnippets
         flush_rewrite_rules();
     }
 
-   function deactivate()
+    function deactivate()
     {
         WpdSnippets::unschedule_my_hooks();
 
@@ -79,14 +82,24 @@ class WpdSnippets
         flush_rewrite_rules();
     }
 
- function enqueue()
+    function enqueue()
     {
         wp_enqueue_style('pluginstyle', plugins_url('/assets/style.css', __FILE__));
+        wp_enqueue_script('pluginscript', plugins_url('/assets/script.js', __FILE__));
 //        wp_enqueue_script();
 //        DELETE CUSTOM POST TYPES
 //        DELETE ALL THE PLUGIN DATA FROM DB
     }
+    function add_new_wpd_snippets_columns($columns){
 
+        $new_columns                = array();
+        $new_columns['cb']          = '<input type="checkbox" />';
+        $new_columns['title']       = __('Title','wpd_snippets');
+        $new_columns['description']  = __('Description','wpd_snippets');
+        $new_columns['tags']      = __('Tags','wpd_snippets');
+        $new_columns['date']        = __('Date','wpd_snippets');
+        return $new_columns;
+    }
     function log_message($message)
     {
         $myFile = plugin_dir_path(__FILE__) . 'grab_from_wpdistro_api_' . date('F') . '.txt';
@@ -214,7 +227,7 @@ class WpdSnippets
             return;
         }
 
-        $this->log_message($snippets . ' Vehicles found');
+        $this->log_message($snippets . ' Snippet found');
 
         $this->process_snippets($snippets);
 
