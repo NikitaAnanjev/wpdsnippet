@@ -37,6 +37,10 @@ class WpdSnippets
         add_action('init', array($this, 'init'));
     }
 
+    function register(){
+        add_action('admin_enqueue_scripts', array($this,'enqueue'));
+    }
+
     function init()
     {
 
@@ -55,7 +59,7 @@ class WpdSnippets
     }
 
 
-    function activate()
+ function activate()
     {
 //    GENERATE CUSTOM POST TYPES
         $this->custom_post_type();
@@ -67,7 +71,7 @@ class WpdSnippets
         flush_rewrite_rules();
     }
 
-    function deactivate()
+   function deactivate()
     {
         WpdSnippets::unschedule_my_hooks();
 
@@ -75,8 +79,10 @@ class WpdSnippets
         flush_rewrite_rules();
     }
 
-    function uninstall()
+ function enqueue()
     {
+        wp_enqueue_style('pluginstyle', plugins_url('/assets/style.css', __FILE__));
+//        wp_enqueue_script();
 //        DELETE CUSTOM POST TYPES
 //        DELETE ALL THE PLUGIN DATA FROM DB
     }
@@ -158,33 +164,8 @@ class WpdSnippets
 
     }
 
-//INSERT DATA FRIN WPD API
+    //INSERT DATA FROMWPD API
 
-    function get_snippets_from_bilinfo()
-    {
-
-        $mystart = time();
-
-        //
-        //
-        //
-        $this->log_message("\n" . 'Start');
-
-        $snippets = $this->get_snippets_via_curl();
-
-        if (!$snippets || !is_array($snippets) || !isset($snippets['Vehicles']) || !is_array($snippets['Vehicles'])) {
-
-            $this->log_message('No snippets' . ('string' === gettype($snippets) ? ' :: ' . $snippets : ''));
-
-            return;
-        }
-
-        $this->log_message($snippets['VehicleCount'] . ' Vehicles found');
-
-        $this->process_snippets($snippets['Vehicles']);
-
-        $this->log_message('Finished. Total execution time: ' . (time() - $mystart) . ' s' . "\n");
-    }
 
     function get_snippets_via_curl()
     {
@@ -226,9 +207,6 @@ class WpdSnippets
         $this->log_message("\n" . 'Start');
         $snippets = $this->get_snippets_via_curl();
 
-//        $snippets = [];
-//        $snippets = $results;
-
         if (!$snippets || !is_array($snippets)) {
 
             $this->log_message('No snippets' . ('string' === gettype($snippets) ? ' :: ' . $snippets : ''));
@@ -236,7 +214,7 @@ class WpdSnippets
             return;
         }
 
-        $this->log_message($snippets. ' Vehicles found');
+        $this->log_message($snippets . ' Vehicles found');
 
         $this->process_snippets($snippets);
 
@@ -314,6 +292,7 @@ class WpdSnippets
 // ACTIVATE THE CLASS
 if (class_exists('WpdSnippets')) {
     $wpdSnippets = new WpdSnippets();
+    $wpdSnippets->register();
 }
 
 
@@ -324,4 +303,4 @@ register_activation_hook(__FILE__, array($wpdSnippets, 'activate'));
 register_deactivation_hook(__FILE__, array($wpdSnippets, 'deactivate'));
 
 // UNINSTALL
-register_uninstall_hook   ( __FILE__, array($wpdSnippets, 'uninstall'));
+//register_uninstall_hook(__FILE__, array($wpdSnippets, 'uninstall'));
