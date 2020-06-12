@@ -37,23 +37,6 @@ class WpdSnippets
         add_action('init', array($this, 'init'));
     }
 
-    function register()
-    {
-        add_action('admin_enqueue_scripts', array($this, 'enqueue'));
-
-        add_filter('manage_edit-wpd_snippets_columns', array($this, 'add_new_wpd_snippets_columns'));
-
-        add_action( 'manage_posts_custom_column', array($this,'bs_projects_table_content'), 10, 2);
-
-    }
-
-    function init()
-    {
-        WpdSnippets::setup_schedules();
-
-        add_action('event_start_grabbing', array($this, 'import_snippets_json_api'));
-    }
-
     public static function setup_schedules()
     {
 
@@ -63,16 +46,29 @@ class WpdSnippets
         }
     }
 
+    function init()
+    {
+        WpdSnippets::setup_schedules();
+
+        add_action('event_start_grabbing', array($this, 'import_snippets_json_api'));
+    }
+
+    function register()
+    {
+        add_action('admin_enqueue_scripts', array($this, 'enqueue'));
+
+        add_filter('manage_edit-wpd_snippets_columns', array($this, 'add_new_wpd_snippets_columns'));
+
+        add_action('manage_posts_custom_column', array($this, 'bs_projects_table_content'), 10, 2);
+
+    }
 
     function activate()
     {
-//    GENERATE CUSTOM POST TYPES
-        $this->custom_post_type();
-        $this->import_snippets_json_api();
+//        $this->custom_post_type();
+//        $this->import_snippets_json_api();
         WpdSnippets::unschedule_my_hooks();
         WpdSnippets::setup_schedules();
-
-//    FLUSH REWRITE RULES
         flush_rewrite_rules();
     }
 
@@ -92,28 +88,30 @@ class WpdSnippets
 //        DELETE CUSTOM POST TYPES
 //        DELETE ALL THE PLUGIN DATA FROM DB
     }
-    function add_new_wpd_snippets_columns($columns){
 
-        $new_columns                = array();
-        $new_columns['cb']          = '<input type="checkbox" />';
-        $new_columns['title']       = __('Title','wpd_snippets');
-        $new_columns['description'] = __('Description','wpd_snippets');
-        $new_columns['code']        = __('Code','wpd_snippets');
-        $new_columns['tags']        = __('Tags','wpd_snippets');
-        $new_columns['date']        = __('Date','wpd_snippets');
+    function add_new_wpd_snippets_columns($columns)
+    {
+
+        $new_columns = array();
+        $new_columns['cb'] = '<input type="checkbox" />';
+        $new_columns['title'] = __('Title', 'wpd_snippets');
+        $new_columns['description'] = __('Description', 'wpd_snippets');
+        $new_columns['code'] = __('Code', 'wpd_snippets');
+        $new_columns['tags'] = __('Tags', 'wpd_snippets');
+        $new_columns['date'] = __('Date', 'wpd_snippets');
 
 
         return $new_columns;
     }
 
-    function bs_projects_table_content( $column_name, $post_id ) {
-        if( 'code' == $column_name ) {
-            $content = get_the_excerpt( $post_id);
-            $content = wp_trim_words( $content, $num_words = 15 );
+    function bs_projects_table_content($column_name, $post_id)
+    {
+        if ('code' == $column_name) {
+            $content = get_the_excerpt($post_id);
+            $content = wp_trim_words($content, $num_words = 15);
             echo $content;
         }
     }
-
 
     function log_message($message)
     {
@@ -140,7 +138,7 @@ class WpdSnippets
     function custom_post_type()
     {
 
-// Set UI labels for Custom Post Type
+        // Set UI labels for Custom Post Type
         $labels = array(
             'name' => _x('WPD_snippets', 'Post Type General Name'),
             'singular_name' => _x('WPD_snippet', 'Post Type Singular Name'),
@@ -156,9 +154,7 @@ class WpdSnippets
             'not_found' => __('Not Found'),
             'not_found_in_trash' => __('Not found in Trash'),
         );
-
-// Set other options for Custom Post Type
-
+        // Set other options for Custom Post Type
         $args = array(
             'label' => __('wpd_snippets'),
             'description' => __('WPD_snippet news and reviews'),
@@ -186,10 +182,8 @@ class WpdSnippets
             'show_in_rest' => true,
 
         );
-
         // Registering your Custom Post Type
         register_post_type('wpd_snippets', $args);
-
     }
 
     //INSERT DATA FROMWPD API
@@ -251,8 +245,6 @@ class WpdSnippets
 
     function process_snippets($snippets)
     {
-
-
         $i = 0;
         foreach ($snippets as $snippet) {
             $snippet_id = $snippet['id'];
