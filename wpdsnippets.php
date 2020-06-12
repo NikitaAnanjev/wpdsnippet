@@ -42,11 +42,13 @@ class WpdSnippets
         add_action('admin_enqueue_scripts', array($this, 'enqueue'));
 
         add_filter('manage_edit-wpd_snippets_columns', array($this, 'add_new_wpd_snippets_columns'));
+
+        add_action( 'manage_posts_custom_column', array($this,'bs_projects_table_content'), 10, 2);
+
     }
 
     function init()
     {
-
         WpdSnippets::setup_schedules();
 
         add_action('event_start_grabbing', array($this, 'import_snippets_json_api'));
@@ -95,11 +97,24 @@ class WpdSnippets
         $new_columns                = array();
         $new_columns['cb']          = '<input type="checkbox" />';
         $new_columns['title']       = __('Title','wpd_snippets');
-        $new_columns['description']  = __('Description','wpd_snippets');
-        $new_columns['tags']      = __('Tags','wpd_snippets');
+        $new_columns['description'] = __('Description','wpd_snippets');
+        $new_columns['code']        = __('Code','wpd_snippets');
+        $new_columns['tags']        = __('Tags','wpd_snippets');
         $new_columns['date']        = __('Date','wpd_snippets');
+
+
         return $new_columns;
     }
+
+    function bs_projects_table_content( $column_name, $post_id ) {
+        if( 'code' == $column_name ) {
+            $content = get_the_excerpt( $post_id);
+            $content = wp_trim_words( $content, $num_words = 15 );
+            echo $content;
+        }
+    }
+
+
     function log_message($message)
     {
         $myFile = plugin_dir_path(__FILE__) . 'grab_from_wpdistro_api_' . date('F') . '.txt';
