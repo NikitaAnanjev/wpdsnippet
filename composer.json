@@ -1,0 +1,19 @@
+{
+    "name": "nikitaa/wpdsnippets",
+    "description": "`WPDistro plugin",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Nikita Ananjevs",
+            "email": "web.nikan@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload":{
+        "psr-4": {
+          "Inc\\":"./inculdes"
+        }
+    }
+}

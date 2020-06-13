@@ -17,6 +17,14 @@ if (!defined('ABSPATH')) {
     die();
 }
 
+if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
+    require_once dirname(__FILE__) . '/vendor/autoload.php';
+};
+
+
+use Includes\Activate;
+
+
 //if (!function_exists('add_action')) {
 //    echo 'Not allowed!';
 //    exit();
@@ -26,9 +34,16 @@ if (!defined('ABSPATH')) {
 
 class WpdSnippets
 {
+
+//VARIABLES
+
+    public $plugin_name;
+
 //METHODS
     function __construct()
     {
+
+        $this->plugin_name = plugin_basename(__FILE__);
         /* Hook into the 'init' action so that the function
         * Containing our post type registration is not
         * unnecessarily executed.
@@ -60,11 +75,35 @@ class WpdSnippets
         add_filter('manage_edit-wpd_snippets_columns', array($this, 'add_new_wpd_snippets_columns'));
 
         add_action('manage_posts_custom_column', array($this, 'bs_projects_table_content'), 10, 2);
+        //Creating custom admin section
+        add_action('admin_menu', array($this, 'add_admin_pages'));
 
+        add_filter("plugin_action_links_$this->plugin_name", array($this, 'setting_plugin_link'));
+    }
+
+    public function setting_plugin_link($links)
+    {
+        $new_link = '<a href="admin?page=wpdistro_plugin_page">Settings</a>';
+
+        array_push($links, $new_link);
+        return $links;
+    }
+
+//add_admin_pages
+    public function add_admin_pages()
+    {
+        add_menu_page('WPD Snippets', 'WPDistro', 'manage_options', 'wpdistro_plugin_page', array($this, 'admin_index_page'), 'dashicons-image-filter', 110);
+//        add_admin_page($page_title, $menu_title, $capability, $menu_slug, '', 'icon ', null);
+    }
+
+    public function admin_index_page()
+    {
+        require_once plugin_dir_path(__FILE__) . 'templates/admin_snippet_page.php';
     }
 
     function activate()
     {
+
 //        $this->custom_post_type();
 //        $this->import_snippets_json_api();
         WpdSnippets::unschedule_my_hooks();

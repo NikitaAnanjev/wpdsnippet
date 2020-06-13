@@ -2,10 +2,16 @@
 ///**
 // * @package WPDSnippets
 // */
-//
-//class WpdSnippetsPluginActivate
-//{
-//
+namespace Includes;
+class Activate
+{
+    function testing()
+    {
+        echo 'something';
+    }
+
+
+}
 //   static $class_title = "ACTIVATION CLASS";
 //
 //
