@@ -149,13 +149,12 @@ class WpdSnippets
     {
 
 
-
         $new_columns = array();
         $new_columns['cb'] = '<input type="checkbox" />';
 
 
-        $status = get_query_var( 'post_status' );
-        if ( 'trash' !== $status ) {
+        $status = get_query_var('post_status');
+        if ('trash' !== $status) {
             $new_columns['activate'] = __('Status', 'wpd_snippets');
         }
 
@@ -305,23 +304,42 @@ class WpdSnippets
         $posts = get_posts($args);
         $active_posts = [];
         foreach ($posts as $post) {
-
-
             $active_snippet = $post->post_content;
-//            $active_snippet_id = $post->ID;
-//            $catch_output = false;
-
-//            $this->execute_snippet($active_snippet, $active_snippet_id, $catch_output);
-
-//            if ($active_snippet) {
-//
-//                $catch_output = true;
-////
-//            }
-
-
+            $active_snippet = sprintf($active_snippet);
+//            echo $active_snippet;
+//            $active_snippet;
+            $this->execute_snippet($active_snippet);
         }
 
+    }
+
+    /**
+     * Prepare the code by removing php tags from beginning and end
+     *
+     * @param string $code
+     *
+     * @return string
+     */
+    function prepare_code($code)
+    {
+
+        /* Remove <?php and <? from beginning of snippet */
+        $code = preg_replace('|^[\s]*<\?(php)?|', '', $code);
+
+        /* Remove ?> from end of snippet */
+        $code = preg_replace('|\?>[\s]*$|', '', $code);
+
+        return $code;
+    }
+
+    function prepare_retrieve_code($code)
+    {
+        /* Remove <?php and <? from beginning of snippet */
+        $code = preg_replace('/<?php/','<?', $code);
+
+
+
+        return $code;
     }
 
     /**
@@ -335,27 +353,27 @@ class WpdSnippets
      * @param bool $catch_output Whether to attempt to suppress the output of execution using buffers
      *
      * @return mixed The result of the code execution
-     * @since 2.0
+     *
      *
      */
-    function execute_snippet($code, $id = 0, $catch_output = true)
+    function execute_snippet($code, $catch_output = true)
     {
 
-        if (empty($code) || defined('CODE_SNIPPETS_SAFE_MODE') && CODE_SNIPPETS_SAFE_MODE) {
-            return false;
-        }
-
+//        if (empty($code) || defined('CODE_SNIPPETS_SAFE_MODE') && CODE_SNIPPETS_SAFE_MODE) {
+//            return false;
+//        }
+        $code = $this->prepare_retrieve_code($code);
+        print_r($code);
         if ($catch_output) {
             ob_start();
         }
+//        eval($code);
 
-        $result = eval($code);
+        $result = ob_get_contents();
 
         if ($catch_output) {
             ob_end_clean();
         }
-//
-//        do_action('code_snippets/after_execute_snippet', $id, $code, $result);
 
         return $result;
     }
@@ -500,6 +518,8 @@ class WpdSnippets
         foreach ($snippets as $snippet) {
             $snippet_id = $snippet['id'];
             $code_snippet = htmlspecialchars($snippet['acf']['code']);
+            $code_snippet = $this->prepare_code($code_snippet);
+
             $slug = $snippet['slug'];
             $title = $snippet['title']['rendered'];
             $i++;
@@ -551,6 +571,7 @@ class WpdSnippets
 
                 update_post_meta($existing_snippet_id, 'import_id', $snippet_id);
                 update_post_meta($existing_snippet_id, 'snippet_active', false);
+
                 update_post_meta($existing_snippet_id, 'code_snippet', $code_snippet);
             } else {
                 $post = $posts[0];
