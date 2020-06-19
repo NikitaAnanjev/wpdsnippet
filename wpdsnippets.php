@@ -21,64 +21,63 @@ if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
     require_once dirname(__FILE__) . '/vendor/autoload.php';
 };
 
-//if (!function_exists('add_action')) {
-//    echo 'Not allowed!';
-//    exit();
-//}
-//setup
-//define('WPDSNIPPETS_PLUGIN_URL', __FILE__);
-
 class WpdSnippets
 {
 
-//VARIABLES
 
     public $plugin_name;
 
-//METHODS
     function __construct()
     {
 
         $this->plugin_name = plugin_basename(__FILE__);
         /* Hook into the 'init' action so that the function
         * Containing our post type registration is not
-        * unnecessarily executed.
         */
         add_action('init', array($this, 'custom_post_type'), 0);
         add_action('init', array($this, 'init'));
     }
 
+    /**
+     * SETUP CRON JOB
+     */
     public static function setup_schedules()
     {
-
         if (!wp_next_scheduled('event_start_grabbing')) {
-
             wp_schedule_event(time(), 'hourly', 'event_start_grabbing');
         }
     }
 
+    /**
+     * CRON job hourly updates
+     */
     function init()
     {
         WpdSnippets::setup_schedules();
-
+        // Get data from API
         add_action('event_start_grabbing', array($this, 'import_snippets_json_api'));
     }
 
     function register()
     {
+        // Enqueue CSS and SCRIPTS.js
         add_action('admin_enqueue_scripts', array($this, 'enqueue'));
-
+        // Create custom columns for the post list
         add_filter('manage_edit-wpd_snippets_columns', array($this, 'add_new_wpd_snippets_columns'));
-
+        // Create custom elements in columns for the post list
         add_action('manage_posts_custom_column', array($this, 'bs_projects_table_content'), 10, 2);
-        //Creating custom admin section
+        // Creating custom admin section
         add_action('admin_menu', array($this, 'add_admin_pages'));
-
+        // Create Link for the custom admin page from plugin list
         add_filter("plugin_action_links_$this->plugin_name", array($this, 'setting_plugin_link'));
-
+        $this->run_ajax_snippets();
     }
 
-
+    /**
+     * Create custom links in the plugin row of plugin list
+     * @param $links
+     * @return mixed
+     */
     public function setting_plugin_link($links)
     {
 
@@ -90,26 +89,34 @@ class WpdSnippets
         return $links;
     }
 
-
+    /**
+     * Custom plugin page and subpage in admin dashboard menu
+     */
     public function add_admin_pages()
     {
         add_menu_page('WPD Snippets', 'WPDistro', 'manage_options', 'wpdistro_plugin_page', array($this, 'admin_index_page'), 'dashicons-image-filter', 110);
         add_submenu_page('wpdistro_plugin_page', 'Snippet Customisation', 'Customise', 'manage_options', 'wpd_snippet_submenu_customisation', array($this, 'wpd_snippet_submenu_customisation'), 100);
     }
 
+    /**
+     * Template for custom plugin page
+     */
     public function admin_index_page()
     {
-
-
         require_once plugin_dir_path(__FILE__) . 'templates/admin_snippet_page.php';
-
     }
 
+    /**
+     *  Template for custom plugin subpage
+     */
     public function wpd_snippet_submenu_customisation()
     {
         require_once plugin_dir_path(__FILE__) . 'templates/admin_snippet_sub_page_customise.php';
     }
 
+    /**
+     * AJAX activate and diactivate snippets
+     */
     function run_ajax_snippets()
     {
         add_action('wp_ajax_my_action', array($this, 'my_action_callback'));
@@ -117,42 +124,45 @@ class WpdSnippets
         add_action('admin_print_footer_scripts', array($this, 'my_action_javascript'), 99);
     }
 
+    /**
+     * Activate plugin
+     */
     function activate()
     {
-        $this->run_ajax_snippets();
-//        $this->custom_post_type();
-//
-//        $this->import_snippets_json_api();
         WpdSnippets::unschedule_my_hooks();
         WpdSnippets::setup_schedules();
         flush_rewrite_rules();
     }
 
+    /**
+     * Deactivate plugin
+     */
     function deactivate()
     {
         WpdSnippets::unschedule_my_hooks();
 
-//    FLUSH REWRITE RULES
         flush_rewrite_rules();
     }
 
+    /**
+     * ENQUEUE style CSS and custom Js files
+     */
     function enqueue()
     {
         wp_enqueue_style('pluginstyle', plugins_url('/assets/style.css', __FILE__));
         wp_enqueue_script('pluginscript', plugins_url('/assets/script.js', __FILE__), 'jQuery');
-//        wp_enqueue_script();
-//        DELETE CUSTOM POST TYPES
-//        DELETE ALL THE PLUGIN DATA FROM DB
     }
 
+    /**
+     * CUSTOM column sections for post list
+     * @param $columns
+     * @return array
+     *
+     */
     function add_new_wpd_snippets_columns($columns)
     {
-
-
         $new_columns = array();
         $new_columns['cb'] = '<input type="checkbox" />';
-
-
         $status = get_query_var('post_status');
         if ('trash' !== $status) {
             $new_columns['activate'] = __('Status', 'wpd_snippets');
@@ -168,16 +178,17 @@ class WpdSnippets
         return $new_columns;
     }
 
-
+    /**
+     * Jquery script for ajax,
+     * in order to send data without embeded <form> tag.
+     * Simply triggering a button or a input boolian toggal true or folse.
+     */
     function my_action_javascript()
     {
         ?>
         <script>
             jQuery(document).ready(function ($) {
-
-
                 $(".scales").click(function () {
-
                     $getvalue = $(this).val();
 
                     if ($(this).is(":checked")) {
@@ -204,29 +215,25 @@ class WpdSnippets
                     );
 
                     xhr.send(a);
-
-
                     var data = {
                         action: 'my_action',
                         toggle: $stat,
                         snippetid: $getvalue
                     };
-                    // с версии 2.8 'ajaxurl' всегда определен в админке
                     jQuery.post(ajaxurl, data, function (response) {
-//                        alert('Получ' + 'ено с сервера: ' + response);
+//                        alert('This is ajax respons: ' + response);
                     });
                 });
-
             });
         </script>
         <?php
     }
 
-
+    /**
+     * Receive AJAX CALL BACK and Update Database you can also use 0 or 1 instead true or false.
+     */
     function my_action_callback()
     {
-//        Writing function for Ajax enable and disable snippets
-//        echo $_POST['action'] . '---';
         $toggle = $_POST['toggle'];
         $selectedsnippetId = $_POST['snippetid'];
         if ($toggle != 0) {
@@ -234,15 +241,17 @@ class WpdSnippets
         } else {
             update_post_meta($selectedsnippetId, 'snippet_active', false);
         }
-
-
         wp_die();
     }
 
+
+    /**
+     * Updating post list elements
+     * @param $column_name
+     * @param $post_id
+     */
     function bs_projects_table_content($column_name, $post_id)
     {
-
-
         if ('activate' == $column_name) {
 
             $active_status = get_post_meta($post_id, 'snippet_active', 'wpd_snippets');
@@ -253,30 +262,20 @@ class WpdSnippets
                 $slug = 'Deactivated';
                 $status = '';
             }
-
-
             echo ' <input value="' . $post_id . '" type="checkbox" class="scales" name="scales"' . $status . ' >';
             echo '<p id="current_snippet_' . $post_id . '">' . $slug . ' </p>';
-
         }
+
         if ('import_id' == $column_name) {
-
-
             $import_id = get_post_meta($post_id, 'import_id', 'wpd_snippets');
-
-
             echo $import_id;
-
         }
+
         if ('status' == $column_name) {
-
-
             $import_id = get_post_meta($post_id, 'import_id', 'wpd_snippets');
-
-
             echo $import_id;
-
         }
+
         if ('code' == $column_name) {
             $content = get_the_excerpt($post_id);
             $content = wp_trim_words($content, $num_words = 15);
@@ -284,9 +283,11 @@ class WpdSnippets
         }
     }
 
+    /**
+     * GET ACTIVE SNIPPETS FROM DATABSE
+     */
     public function get_active_snippets()
     {
-
         // CHECK IF THE CAR ALREADY EXISTS
         $args = array(
             'post_type' => 'wpd_snippets',
@@ -310,7 +311,6 @@ class WpdSnippets
 //            $active_snippet;
             $this->execute_snippet($active_snippet);
         }
-
     }
 
     /**
@@ -335,10 +335,7 @@ class WpdSnippets
     function prepare_retrieve_code($code)
     {
         /* Remove <?php and <? from beginning of snippet */
-        $code = preg_replace('/<?php/','<?', $code);
-
-
-
+        $code = preg_replace('/<?php/', '<?', $code);
         return $code;
     }
 
@@ -354,31 +351,35 @@ class WpdSnippets
      *
      * @return mixed The result of the code execution
      *
+     * *********** READ MORE ABOUT eval() ---> PHP function specifics
      *
      */
-    function execute_snippet($code, $catch_output = true)
+    function execute_snippet($code)
     {
 
 //        if (empty($code) || defined('CODE_SNIPPETS_SAFE_MODE') && CODE_SNIPPETS_SAFE_MODE) {
 //            return false;
 //        }
-        $code = $this->prepare_retrieve_code($code);
+//        $code = $this->prepare_retrieve_code($code);
+
         print_r($code);
-        if ($catch_output) {
-            ob_start();
-        }
+
+        ob_start();
+
 //        eval($code);
 
         $result = ob_get_contents();
 
-        if ($catch_output) {
-            ob_end_clean();
-        }
+
+        ob_end_clean();
+
 
         return $result;
     }
 
     /**
+     *
+     * LOG Writing function creates a txt file in the plugin folder.
      * @param $message
      */
 
@@ -391,6 +392,10 @@ class WpdSnippets
         fclose($fh);
     }
 
+    /**
+     * This function flush cron hook from the system
+     * when you deactivate or unninstall the plugin
+     */
     private static function unschedule_my_hooks()
     {
 
@@ -457,7 +462,10 @@ class WpdSnippets
 
     //INSERT DATA FROMWPD API
 
-
+    /**
+     * @return mixed|string
+     * SETUP API DATA
+     */
     function get_snippets_via_curl()
     {
         $API_URL = 'https://wpdistro.com/wp-json/wp/v2/posts/';
@@ -491,7 +499,9 @@ class WpdSnippets
 
     }
 
-
+    /**
+     * GET API DATA
+     */
     function import_snippets_json_api()
     {
         $mystart = time();
@@ -512,13 +522,17 @@ class WpdSnippets
         $this->log_message('Finished. Total execution time: ' . (time() - $mystart) . ' s' . "\n");
     }
 
+    /**
+     * STORE SNIPPET DATA FROM API TO THE CUSTOM POST TYPES
+     * @param $snippets
+     */
     function process_snippets($snippets)
     {
         $i = 0;
         foreach ($snippets as $snippet) {
             $snippet_id = $snippet['id'];
             $code_snippet = htmlspecialchars($snippet['acf']['code']);
-            $code_snippet = $this->prepare_code($code_snippet);
+//            $code_snippet = $this->prepare_code($code_snippet);
 
             $slug = $snippet['slug'];
             $title = $snippet['title']['rendered'];
