@@ -334,8 +334,7 @@ class WpdSnippets
 
     function prepare_retrieve_code($code)
     {
-        /* Remove <?php and <? from beginning of snippet */
-        $code = preg_replace('/<?php/', '<?', $code);
+        $code = html_entity_decode($code);
         return $code;
     }
 
@@ -360,13 +359,13 @@ class WpdSnippets
 //        if (empty($code) || defined('CODE_SNIPPETS_SAFE_MODE') && CODE_SNIPPETS_SAFE_MODE) {
 //            return false;
 //        }
-//        $code = $this->prepare_retrieve_code($code);
+        $code = $this->prepare_retrieve_code($code);
 
-        print_r($code);
+//        print_r($code);
 
         ob_start();
 
-//        eval($code);
+        eval($code);
 
         $result = ob_get_contents();
 
